@@ -46,6 +46,16 @@ defmodule ExUnitNotifier do
     {:noreply, counter}
   end
 
+  def handle_cast({:suite_finished, %{run_us: run_us, load_us: load_us}}, counter) do
+    apply(notifier(), :notify, [
+      status(counter),
+      MessageFormatter.format(counter, run_us, load_us),
+      opts()
+    ])
+
+    {:noreply, counter}
+  end
+
   def handle_cast(_, counter), do: {:noreply, counter}
 
   defp status(%Counter{failures: failures, invalid: invalid}) when failures > 0 or invalid > 0,
